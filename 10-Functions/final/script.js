@@ -2,7 +2,7 @@
 
 /*
 ///////////////////////////////////////
-// Default Parameters
+// Default Parameters test
 const bookings = [];
 
 const createBooking = function (
