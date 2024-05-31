@@ -10,6 +10,7 @@ const account1 = {
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
   interestRate: 1.2, // %
   pin: 1111,
+  username: 'js',
 };
 
 const account2 = {
@@ -17,6 +18,7 @@ const account2 = {
   movements: [5000, 3400, -150, -790, -3210, -1000, 8500, -30],
   interestRate: 1.5,
   pin: 2222,
+  // username: createUsername(this.owner),
 };
 
 const account3 = {
@@ -76,32 +78,55 @@ const displayMovements = function (movements) {
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
-displayMovements(account1.movements);
+// displayMovements(account1.movements);
 
-const user = 'Steven Thomas Williams'; // stw
-const username = user
-  .toLowerCase()
-  .split(' ')
-  .map(word => word[0])
-  .join('');
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
+const createUsername = function (accs) {
+  accs.forEach(function (acc) {
+    acc.username = acc.owner
+      .toLowerCase()
+      .split(' ')
+      .map(word => word[0])
+      .join('');
+  });
+};
 
-const currencies = new Map([
-  ['USD', 'United States dollar'],
-  ['EUR', 'Euro'],
-  ['GBP', 'Pound sterling'],
-]);
+createUsername(accounts);
+
+const calcDisplayBalance = function (acc) {
+  acc.balance = acc.movements.reduce(function (accum, mov, i, arr) {
+    return accum + mov;
+  }, 0);
+  labelBalance.textContent = `${acc.balance} EUR`;
+};
+
+const calcDisplaySummary = function (acc) {
+  const incomes = acc.movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumIn.textContent = `${incomes} EUR`;
+
+  const out = acc.movements
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumOut.textContent = `${Math.abs(out)} EUR`;
+
+  const interest = acc.movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * acc.interestRate) / 100)
+    .filter(int => int >= 1)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumInterest.textContent = `${interest} EUR`;
+};
 
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
 
 const eurToUsd = 1.1;
-const movementsUSD = movements.map(function (mov) {
-  return mov * eurToUsd;
-});
+const totalDepositsUSD = movements
+  .filter(mov => mov > 0)
+  .map(mov => mov * eurToUsd)
+  .reduce((acc, mov) => acc + mov, 0);
 
 const movementDescription = movements.map(
   (mov, i) =>
@@ -109,3 +134,62 @@ const movementDescription = movements.map(
       mov
     )}`
 );
+
+const deposits = movements.filter(function (mov) {
+  return mov > 0;
+});
+
+const withdrawals = movements.filter(function (mov) {
+  return mov < 0;
+});
+
+const firstWithdraw = movements.find(mov => mov < 0);
+
+let currentAccount;
+
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault();
+  currentAccount = accounts.find(
+    acc => acc.username === inputLoginUsername.value
+  );
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    labelWelcome.textContent = `Welcome back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+    containerApp.style.opacity = 100;
+    displayMovements(currentAccount.movements);
+    calcDisplayBalance(currentAccount);
+    calcDisplaySummary(currentAccount);
+    inputLoginUsername.value = '';
+    inputLoginPin.value = '';
+    inputLoginPin.blur();
+  }
+});
+
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const recieverAccount = accounts.find(
+    acc => acc.username === inputTransferTo.value
+  );
+  if (amount > 0 && recieverAccount && currentAccount.balance >= amount) {
+    currentAccount.movements.push(-amount);
+    recieverAccount.movements.push(amount);
+    displayMovements(currentAccount.movements);
+    calcDisplayBalance(currentAccount);
+    calcDisplaySummary(currentAccount);
+  }
+});
+
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault();
+  if (
+    currentAccount.username === inputCloseUsername.value &&
+    currentAccount.pin === Number(inputClosePin.value)
+  ) {
+    const index = accounts.findIndex(
+      acc => acc.username === currentAccount.username
+    );
+    accounts.splice(index, 1);
+  }
+});
