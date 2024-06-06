@@ -73,8 +73,15 @@ nav.addEventListener('mouseout', function (e) {
   handleHover(e, 1);
 });
 
-const initialCoords = section1.getBoundingClientRect();
-window.addEventListener('scroll', function () {
-  if (window.scrollY > initialCoords.top) nav.classList.add('sticky');
-  else nav.classList.remove('sticky');
-});
+// const initialCoords = section1.getBoundingClientRect();
+// window.addEventListener('scroll', function () {
+//   if (window.scrollY > initialCoords.top) nav.classList.add('sticky');
+//   else nav.classList.remove('sticky');
+// });
+
+// const obsCallback = function (entries, observer) {};
+
+// const obsOptions = {};
+
+// const observer = new IntersectionObserver(obsCallback, obsOptions);
+// observer.observe(section1);
