@@ -1,0 +1,15 @@
+{
+  "name": "forkify",
+  "version": "1.0.0",
+  "description": "This branch of the repo contains starter files and final code for all sections and projects of the course, **exactly as shown in the videos**.",
+  "main": "index.html",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "author": "Chris Mackall",
+  "license": "ISC",
+  "dependencies": {
+    "parcel": "^2.12.0"
+  }
+}
