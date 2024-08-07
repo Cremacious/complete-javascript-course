@@ -22,7 +22,7 @@ class RecipeView extends View {
   renderSpinner() {
     const markup = `<div class="spinner">
     <svg>
-      <use href="${icons}_icon-loader"></use>
+      <use href="${icons}#icon-loader"></use>
     </svg>
   </div>`;
     this._clear();
@@ -33,7 +33,7 @@ class RecipeView extends View {
     const markup = `<div class="error">
             <div>
               <svg>
-                <use href="${icons}_icon-alert-triangle"></use>
+                <use href="${icons}#icon-alert-triangle"></use>
               </svg>
             </div>
             <p>${message}</p>
@@ -46,7 +46,7 @@ class RecipeView extends View {
     const markup = `<div class="message">
             <div>
               <svg>
-                <use href="${icons}_icon-smile"></use>
+                <use href="${icons}#icon-smile"></use>
               </svg>
             </div>
             <p>${message}</p>
@@ -58,6 +58,26 @@ class RecipeView extends View {
   addHandlerRender(handler) {
     ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, handler));
   }
+
+  addHandlerUpdateServings(handler) {
+    this._parentElement.addEventListener('click', function (e) {
+      const btn = e.target.closest('.btn--update-servings');
+      if (!btn) return;
+      const updateTo = +btn.dataset.updateTo;
+      if (+updateTo > 0) handler(+updateTo);
+    });
+  }
+
+  addHandlerAddBookmark (handler) {
+    this._parentElement.addEventListener('click', function(e) {
+      e.preventDefault
+      const btn = e.target.closest('.btn--bookmark')
+      if (!btn) return 
+      handler()
+
+    })
+  }
+
 
   _generateMarkup() {
     return `
@@ -73,7 +93,7 @@ class RecipeView extends View {
         <div class="recipe__details">
           <div class="recipe__info">
             <svg class="recipe__info-icon">
-              <use href="${icons}_icon-clock"></use>
+              <use href="${icons}#icon-clock"></use>
             </svg>
             <span class="recipe__info-data recipe__info-data--minutes">${
               this._data.cookingTime
@@ -82,7 +102,7 @@ class RecipeView extends View {
           </div>
           <div class="recipe__info">
             <svg class="recipe__info-icon">
-              <use href="${icons}_icon-users"></use>
+              <use href="${icons}#icon-users"></use>
             </svg>
             <span class="recipe__info-data recipe__info-data--people">${
               this._data.servings
@@ -90,14 +110,18 @@ class RecipeView extends View {
             <span class="recipe__info-text">servings</span>
 
             <div class="recipe__info-buttons">
-              <button class="btn--tiny btn--increase-servings">
+              <button class="btn--tiny btn--update-servings" data-update-to="${
+                this._data.servings - 1
+              }">
                 <svg>
-                  <use href="${icons}_icon-minus-circle"></use>
+                  <use href="${icons}#icon-minus-circle"></use>
                 </svg>
               </button>
-              <button class="btn--tiny btn--increase-servings">
+              <button class="btn--tiny btn--update-servings" data-update-to="${
+                this._data.servings + 1
+              }">
                 <svg>
-                  <use href="${icons}_icon-plus-circle"></use>
+                  <use href="${icons}#icon-plus-circle"></use>
                 </svg>
               </button>
             </div>
@@ -106,9 +130,9 @@ class RecipeView extends View {
           <div class="recipe__user-generated">
 
           </div>
-          <button class="btn--round">
+          <button class="btn--round btn--bookmark">
             <svg class="">
-              <use href="${icons}_icon-bookmark-fill"></use>
+              <use href="${icons}#icon-bookmark${this._data.bookmarked ? '-fill' : ''}"></use>
             </svg>
           </button>
         </div>
@@ -148,7 +172,7 @@ class RecipeView extends View {
   _generateMarkupIngredient(ing) {
     return `<li class="recipe__ingredient">
     <svg class="recipe__icon">
-      <use href="${icons}_icon-check"></use>
+      <use href="${icons}#icon-check"></use>
     </svg>
     <div class="recipe__quantity">${
       ing.quantity ? new Fraction(ing.quantity).toString() : ''
